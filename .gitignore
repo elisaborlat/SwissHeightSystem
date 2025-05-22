@@ -1,0 +1,40 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# === Jupyter Notebooks ===
+.ipynb_checkpoints/
+
+# === VS Code ===
+.vscode/
+
+# === Environnements virtuels ===
+venv/
+.env/
+.envrc
+
+# === Données volumineuses ===
+data/raw/*
+!data/raw/README.md
+
+# === Logs et outputs ===
+*.log
+*.out
+*.aux
+
+# === Java ===
+*.class
+*.jar
+*.war
+*.ear
+target/
+bin/
+
+# === Système ===
+.DS_Store
+Thumbs.db
