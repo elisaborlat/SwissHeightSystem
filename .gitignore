@@ -7,6 +7,9 @@ __pycache__/
 dist/
 build/
 
+# === Pytest ===
+.pytest_cache/
+
 # === Jupyter Notebooks ===
 .ipynb_checkpoints/
 
