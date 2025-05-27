@@ -1,4 +1,4 @@
-from python.compute_htrans import Grid, compute_htrans
+from lib.compute_htrans import Grid, compute_htrans
 import numpy as np
 
 def test_compute_htrans():

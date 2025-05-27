@@ -1,4 +1,4 @@
-from python.compute_normal_height import compute_normal_height_from_pot
+from lib.compute_normal_height import compute_normal_height_from_pot
 
 def test_compute_normal_height_from_pot():
     # Données d'entrée (point UELN 100026 ou GR 3489, BlattEVRF2019_final_update.csv)

@@ -30,6 +30,42 @@ class Grid :
         return grid_X, grid_Y
         
     def import_ascii_raster(self, file_path, mode=''):
+        """
+        Imports an ASCII raster file and loads its data and metadata into the instance attributes.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the ASCII raster file.
+        mode : str, optional
+            The mode for reading data. Default is ''. If 'Urs', data will be read 
+            row by row and re-ordered. Otherwise, the entire data grid is loaded 
+            at once using `numpy.loadtxt`.
+
+        Attributes Set
+        --------------
+        ncols : int
+            Number of columns in the raster grid.
+        nrows : int
+            Number of rows in the raster grid.
+        Xmin : float
+            Minimum x-coordinate (bottom-left corner).
+        Xmax : float
+            Maximum x-coordinate (top-right corner).
+        Ymin : float
+            Minimum y-coordinate (bottom-left corner).
+        Ymax : float
+            Maximum y-coordinate (top-right corner).
+        data : numpy.ndarray
+            The raster data array, either directly loaded or re-ordered based on mode.
+
+        Notes
+        -----
+        For details on the ASCII raster format, see:
+        https://modis.ornl.gov/documentation/ascii_grid_format.html
+        Y is the abscisse (East coord)
+        X is the ordinate (Nord coord)
+        """
     
         with open(file_path, 'r') as file:
             # Read header
@@ -45,7 +81,81 @@ class Grid :
             self.Xmin = xllcorner
             self.Xmax = xllcorner + self.cellsize * (self.nrows-1)
             self.Ymin = yllcorner
-            self.Ymax = yllcorner + self.cellsize * (self.ncols-1) 
+            self.Ymax = yllcorner + self.cellsize * (self.ncols-1)
+            
+    def import_file_DSAA_grid(self, path_import):
+        path_import = 'data/raw/'+ path_import
+        # Create object for read file
+        file = open(path_import, 'r')
+        
+        ## Parameter of grid
+        # Verify first line
+        line = file.readline().strip()
+        if line == 'DSAA':
+            
+            # Rows, cols of grid
+            line = file.readline().strip()
+            data = line.split(' ')
+            cols, rows = int(data[0]), int(data[1])
+            
+            # Ymin, Ymax
+            line = file.readline().strip()
+            data = line.split(' ')
+            Ymin, Ymax = float(data[0]), float(data[1])
+            
+            # Xmin, Xmax
+            line = file.readline().strip()
+            data = line.split(' ')
+            Xmin, Xmax = float(data[0]), float(data[1])
+        
+            
+            # VZmin, VZmax (vitesse en Z)
+            line = file.readline().strip()
+            data = line.split(' ')
+            VZmin, VZmax = float(data[0]), float(data[1])
+            
+            # Compute of resolution
+            Xresolution = (Xmax - Xmin)/(rows-1)
+            Yresolution = (Ymax - Ymin)/(cols-1)
+            
+            # Read value of VZ
+            line = line = file.readline()
+            
+            array_general = []
+            array_row = []
+            
+            while line:
+                
+                # On est dans un bloc, donc on ajoute les éléments
+                if len(line) >= 5:
+                    data = line.strip().split(' ')
+                    for i in data:
+                        i = float(i)
+                        if VZmin <= i <= VZmax :
+                            array_row.append(i)
+                        else:
+                            print('ERROR: VZ not includes in [VZmin; VZmax]')
+                
+                # On change de bloc donc on réinitialise la liste
+                else :
+                    array_general.append(array_row)
+                    array_row = []
+                
+                line = file.readline()
+
+            self.data = np.flipud(np.array(array_general))
+            self.ncols = cols
+            self.nrows = rows
+            self.Xmin = Xmin
+            self.Xmax = Xmax
+            self.Ymin = Ymin
+            self.Ymax = Ymax
+            self.cellsize = Xresolution
+            
+        else :
+            file.close()
+            print("ERROR: 'DSAA' not present")
+            return None
 
 
     def biquadratic(self, east_grid_pos, north_grid_pos):

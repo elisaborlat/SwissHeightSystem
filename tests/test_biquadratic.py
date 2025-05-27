@@ -1,5 +1,5 @@
 
-from python.biquadtratic import get_grid_pos, biquadratic
+from lib.biquadtratic import get_grid_pos, biquadratic
 import numpy as np
 
 def test_biquadtatic():
